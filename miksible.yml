@@ -46,7 +46,7 @@
       community.routeros.routeros_command:
         commands:
           - /ip address add address={{ network2_interface }} interface=ether2
-          - /ip pool add name=pool2 ranges={{ network2_pool }}  # Use a different pool name to avoid conflict
+          - /ip pool add name=pool1 ranges={{ network2_pool }}  
           - /ip dhcp-server add address-pool=pool2 interface=ether2 lease-time=1h name=dhcp-server
           - /ip dhcp-server network add address={{ network2 }} gateway={{ network2_interface }} dns-server={{ dns_servers }}
       when: inventory_hostname == "mikrotik2" and existing_ip_ether2.stdout | length == 0
@@ -55,7 +55,7 @@
       community.routeros.routeros_command:
         commands:
           - /ip address add address={{ network3_interface }} interface=ether2
-          - /ip pool add name=pool3 ranges={{ network3_pool }}  # Use a different pool name to avoid conflict
+          - /ip pool add name=pool1 ranges={{ network3_pool }}  
           - /ip dhcp-server add address-pool=pool3 interface=ether2 lease-time=1h name=dhcp-server
           - /ip dhcp-server network add address={{ network3 }} gateway={{ network3_interface }} dns-server={{ dns_servers }}
       when: inventory_hostname == "mikrotik3" and existing_ip_ether2.stdout | length == 0
