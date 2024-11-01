@@ -1,0 +1,18 @@
+all:
+  mikros:
+    mikrotik1:
+      ansible_host: 192.168.100.254
+      ansible_user: ans
+      ansible_password: "{{ mikrotik1_password }}"
+      ansible_network_os: community.routeros.routeros
+    mikrotik2:
+      ansible_host: 192.168.101.254
+      ansible_user: ans
+      ansible_password: "{{ mikrotik2_password }}"
+      ansible_network_os: community.routeros.routeros
+    mikrotik3:
+      ansible_host: 192.168.102.254
+      ansible_user: ans
+      ansible_password: "{{ mikrotik3_password }}"
+      ansible_network_os: community.routeros.routeros
+

@@ -1,0 +1,62 @@
+---
+- name: Check if interface ether1 already has an address
+  community.routeros.routeros_command:
+    commands:
+      - /ip address find interface=ether1
+    register: existing_ip_ether1
+    ignore_errors: yes
+
+- name: Check if interface ether2 already has an address
+  community.routeros.routeros_command:
+    commands:
+      - /ip address find interface=ether2
+    register: existing_ip_ether2
+    ignore_errors: yes
+
+- name: Configure interfaces
+  hosts: mikros 
+  vars:
+    network1: 172.16.100.0/24
+    network1_interface: 172.16.100.254
+    network1_pool: 172.16.100.20-172.16.100.200
+    network2: 172.16.101.0/24
+    network2_interface: 172.16.101.254
+    network2_pool: 172.16.101.20-172.16.101.200
+    network3: 172.16.102.0/24
+    network3_interface: 172.16.102.254
+    network3_pool: 172.16.102.20-172.16.102.200
+    dns_servers:  "8.8.8.8,8.8.4.4"
+  gather_facts: no
+  tasks:
+    - name: Configure DHCP Client on the WAN interface
+      community.routeros.routeros_command:
+        commands:
+          - /ip dhcp-client add interface=ether1 disable=no use-peer-dns=yes
+      when: existing_ip_ether1.stdout | length == 0
+    - name: Configure LAN interface on mikrotik1
+      community.routeros.routeros_command:
+        commands:
+          - /ip address add address={{ network1_interface }} interface=ether2
+          - /ip pool add name=pool1 ranges={{ network1_pool }}
+          - /ip dhcp-server add address-pool=pool1 interface=ether2 lease-time=1h name=dhcp-server
+          - /ip dhcp-server network add address={{ network1 }} gateway={{ network1_interface }} dns-server={{ dns_servers }}
+      when: inventory_hostname == "mikrotik1" and existing_ip_ether2.stdout | length == 0
+
+    - name: Configure LAN interface on mikrotik2
+      community.routeros.routeros_command:
+        commands:
+          - /ip address add address={{ network2_interface }} interface=ether2
+          - /ip pool add name=pool2 ranges={{ network2_pool }}  # Use a different pool name to avoid conflict
+          - /ip dhcp-server add address-pool=pool2 interface=ether2 lease-time=1h name=dhcp-server
+          - /ip dhcp-server network add address={{ network2 }} gateway={{ network2_interface }} dns-server={{ dns_servers }}
+      when: inventory_hostname == "mikrotik2" and existing_ip_ether2.stdout | length == 0
+
+    - name: Configure LAN interface on mikrotik3
+      community.routeros.routeros_command:
+        commands:
+          - /ip address add address={{ network3_interface }} interface=ether2
+          - /ip pool add name=pool3 ranges={{ network3_pool }}  # Use a different pool name to avoid conflict
+          - /ip dhcp-server add address-pool=pool3 interface=ether2 lease-time=1h name=dhcp-server
+          - /ip dhcp-server network add address={{ network3 }} gateway={{ network3_interface }} dns-server={{ dns_servers }}
+      when: inventory_hostname == "mikrotik3" and existing_ip_ether2.stdout | length == 0
+
