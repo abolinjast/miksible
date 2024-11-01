@@ -1,7 +1,7 @@
 ```markdown
 # miksible                      
 
-miksible is a word i that i created for combinig MikroTik and Ansible, with miksible, configuring mikrotik devices is not boring anymore :0
+miksible is a word that i created for combinig MikroTik and Ansible, with miksible, configuring mikrotik devices is not boring anymore :0
 
 ## Requirements
 
